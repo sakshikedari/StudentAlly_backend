@@ -1,19 +1,14 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "type": "commonjs",
   "main": "api/index.js",
   "scripts": {
-  "dev": "nodemon api/index.js",
-},
-
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+    "dev": "nodemon api/index.js"
+  },
   "engines": {
-  "node": "18.x",
-},
+    "node": "18.x"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
