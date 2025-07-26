@@ -5,8 +5,6 @@
   "main": "api/index.js",
   "scripts": {
   "dev": "nodemon api/index.js",
-  "lint": "eslint .",
-  "test": "echo \"Error: no test specified\" && exit 1"
 },
 
   "keywords": [],
@@ -14,8 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "engines": {
-  "node": ">=18.0.0",
-  "npm": ">=9.0.0"
+  "node": "18.x",
 },
   "dependencies": {
     "bcryptjs": "^2.4.3",
