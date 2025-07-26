@@ -27,8 +27,8 @@ const pool = new Pool({
 
 // Check Database Connection
 pool.connect()
-  .then(() => console.log("✅ Connected to PostgreSQL"))
-  .catch(err => console.error("❌ Database Connection Error:", err.stack));
+  .then(() => console.log("Connected to PostgreSQL"))
+  .catch(err => console.error("Database Connection Error:", err.stack));
 
 
 app.get("/success-stories", async (req, res) => {
@@ -84,11 +84,11 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("🚀 Backend is running on port 5000...");
+  res.send("Backend is running on Vercel!");
 });
 
 app.use("/api/auth", require("./routes/authRoutes"));
 
 // const PORT = 5000;
-// app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 module.exports = app;
