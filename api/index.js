@@ -12,7 +12,7 @@ const alumniRoutes=require("../routes/alumni.js")
 const app = express();
 
 // Middleware
-app.use(cors({ origin: "https://student-ally-backend.vercel.app/", credentials: true }));
+app.use(cors({ origin: "https://student-ally-backend.vercel.app", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
