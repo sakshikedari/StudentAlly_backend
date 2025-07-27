@@ -3,11 +3,11 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { Pool } = require("pg");
-const jobRoutes = require("./routes/jobRoutes");
-const eventRoutes=require("./routes/events");
-const donationRoutes = require("./routes/donations");
-const adminRoutes = require("./routes/adminRoutes");
-const alumniRoutes=require("./routes/alumni.js")
+const jobRoutes = require("../routes/jobRoutes");
+const eventRoutes=require("../routes/events");
+const donationRoutes = require("../routes/donations");
+const adminRoutes = require("../routes/adminRoutes");
+const alumniRoutes=require("../routes/alumni.js")
 
 const app = express();
 
@@ -71,7 +71,7 @@ app.post("/success-stories", async (req, res) => {
 app.use("/alumni",alumniRoutes);
 
 app.use("/admin", adminRoutes);
-app.use("/admin/auth", require("./routes/adminAuthRoutes"));
+app.use("/admin/auth", require("../routes/adminAuthRoutes"));
 
 app.use("/jobs", jobRoutes);
 
@@ -87,7 +87,7 @@ app.get("/", (req, res) => {
   res.send("Backend is running on Vercel!");
 });
 
-app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/auth", require("../routes/authRoutes"));
 
 // const PORT = 5000;
 // app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
