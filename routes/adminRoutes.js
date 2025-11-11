@@ -1,36 +1,34 @@
+// routes/adminRoutes.js
 const express = require("express");
+const pool = require("../config/pool");
 const { authenticateAdmin, authorizeRole } = require("../middleware/authMiddleware");
-const { Pool } = require("pg");
 require("dotenv").config();
 
 const router = express.Router();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    require: true,
-    rejectUnauthorized: false, 
-  },
-});
+router.post("/register", authenticateAdmin, authorizeRole(["superadmin"]), async (req, res) => {
+  const { name, email, password, role } = req.body;
+  if (!(name && email && password && role)) return res.status(400).json({ error: "All fields are required" });
 
+  try {
+    const bcrypt = require("bcryptjs");
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      "INSERT INTO admin (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role",
+      [name, email, hashedPassword, role]
+    );
+    res.status(201).json({ message: "Admin registered successfully!", admin: result.rows[0] });
+  } catch (error) {
+    console.error("Error registering admin:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 router.get("/all-users", authenticateAdmin, authorizeRole(["superadmin"]), async (req, res) => {
   try {
-
     const adminResult = await pool.query("SELECT id, name, email, role FROM admin");
-
-    const userResult = await pool.query(`
-      SELECT id, name, email, 
-        CASE 
-          WHEN role = 'alumni' THEN 'alumni'
-          WHEN role = 'student' THEN 'student'
-          ELSE 'unknown'
-        END AS role
-      FROM users
-    `);
-
+    const userResult = await pool.query("SELECT id, name, email, role FROM users");
     const allUsers = [...adminResult.rows, ...userResult.rows];
-
     res.json(allUsers);
   } catch (error) {
     console.error(" Error fetching users and admins:", error);
@@ -38,34 +36,13 @@ router.get("/all-users", authenticateAdmin, authorizeRole(["superadmin"]), async
   }
 });
 
-router.get("/filtered", authenticateAdmin, async (req, res) => {
-  try {
-    const adminRole = req.admin.role; 
-
-    if (adminRole === "superadmin") {
-      const result = await pool.query("SELECT id, name, email, role FROM admin");
-      return res.json(result.rows);
-    } else if (adminRole === "admin") {
-      const result = await pool.query("SELECT id, name, email, role FROM admin WHERE role = 'moderator'");
-      return res.json(result.rows);
-    } else if (adminRole === "moderator") {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    res.status(403).json({ error: "Unauthorized access" });
-  } catch (error) {
-    console.error("Error fetching filtered admins", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-
 router.delete("/delete/:id", authenticateAdmin, authorizeRole(["superadmin"]), async (req, res) => {
+  console.log("DELETE request received for ID:", req.params.id);
   const { id } = req.params;
-
   try {
-    await pool.query("DELETE FROM admin WHERE id = $1", [id]);
-    res.json({ message: "Admin deleted successfully" });
+    const result = await pool.query("DELETE FROM admin WHERE id = $1 RETURNING id, name, email", [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: "Admin not found" });
+    res.json({ message: "Admin deleted successfully", deleted: result.rows[0] });
   } catch (error) {
     console.error("Error deleting admin", error);
     res.status(500).json({ error: "Server error" });

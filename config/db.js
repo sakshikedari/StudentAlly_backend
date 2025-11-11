@@ -1,7 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 require("dotenv").config();
 
-// Database connection
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
   protocol: "postgres",
@@ -9,11 +8,10 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, 
+      rejectUnauthorized: false,
     },
   },
 });
-
 
 // Test connection
 sequelize
@@ -47,15 +45,14 @@ const User = sequelize.define(
     },
   },
   {
-    timestamps: true, // Enable createdAt & updatedAt
-    tableName: "users", // Ensure the correct table name
+    timestamps: true, 
+    tableName: "users", 
   }
 );
 
-// Sync models with the database (for development)
 sequelize
   .sync({ alter: true }) 
-  .then(() => console.log("✅ Database & tables synced!"))
-  .catch((err) => console.error("❌ Error syncing database:", err));
+  .then(() => console.log("Database & tables synced!"))
+  .catch((err) => console.error("Error syncing database:", err));
 
 module.exports = { sequelize, User };

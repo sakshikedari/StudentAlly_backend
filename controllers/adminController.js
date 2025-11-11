@@ -1,31 +1,26 @@
-const User = require('../models/User');
+const pool = require("../config/pool");
 
-const getAllUsers = async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json(users);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
+async function getAllUsers(req, res) {
+  try {
+    const adminResult = await pool.query("SELECT id, name, email, role FROM admin");
+    const userResult = await pool.query("SELECT id, name, email, role FROM users");
+    res.json([...adminResult.rows, ...userResult.rows]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+}
 
-const updateUser = async (req, res) => {
-    try {
-        const { role } = req.body;
-        await User.update({ role }, { where: { id: req.params.id } });
-        res.json({ message: "User updated successfully" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
+async function deleteUser(req, res) {
+  try {
+    const { id } = req.params;
+    const { rows } = await pool.query("DELETE FROM users WHERE id = $1 RETURNING id, name, email", [id]);
+    if (!rows.length) return res.status(404).json({ message: "User not found" });
+    res.json({ message: "User deleted", deleted: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+}
 
-const deleteUser = async (req, res) => {
-    try {
-        await User.destroy({ where: { id: req.params.id } });
-        res.json({ message: "User deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
-module.exports = { getAllUsers, updateUser, deleteUser };
+module.exports = { getAllUsers, deleteUser };

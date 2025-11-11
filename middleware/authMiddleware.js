@@ -1,41 +1,32 @@
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-const authenticateAdmin = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized: No token provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
+function authenticateAdmin(req, res, next) {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : req.cookies?.token;
 
-    if (!decoded || !decoded.role) {
-      return res.status(403).json({ error: "Invalid token structure" });
-    }
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-    req.admin = decoded;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.admin = { id: decoded.id, email: decoded.email, role: decoded.role };
     next();
   } catch (error) {
-    return res.status(403).json({ error: "Invalid token" });
+    console.error("Auth error:", error.message);
+    return res.status(401).json({ error: "Invalid or expired token" });
   }
-};
+}
 
-const authorizeRole = (allowedRoles) => (req, res, next) => {
+function authorizeRole(allowedRoles = []) {
+  return (req, res, next) => {
+    if (!req.admin) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.admin.role)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    next();
+  };
+}
 
-  if (!req.admin) {
-    return res.status(403).json({ error: "Access denied. No admin data." });
-  }
-
-  const { role } = req.admin;
-
-  if (!allowedRoles.includes(role)) {
-    return res.status(403).json({ error: "Access denied. Insufficient permissions." });
-  }
-
-  next();
-};
-
-module.exports = { authenticateAdmin, authorizeRole,};
+module.exports = { authenticateAdmin, authorizeRole };

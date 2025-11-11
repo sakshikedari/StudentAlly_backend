@@ -1,16 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { Pool } = require("pg");
+const pool = require('../config/pool');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,
-  },
-});
 
-// GET all jobs
 router.get("/", async (req, res) => {
   try {
     const jobs = await pool.query("SELECT * FROM jobs ORDER BY id DESC");
