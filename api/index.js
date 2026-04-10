@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const pool = require("../config/pool");
 const serverless = require("serverless-http");
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 
@@ -40,6 +41,9 @@ app.use("/jobs", require("../routes/jobRoutes"));
 app.use("/events", require("../routes/events"));
 app.use("/donations", require("../routes/donations"));
 app.use("/api/auth", require("../routes/authRoutes"));
+
+
+app.use('/api/chat', chatRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", message: "Server is running smoothly" });
