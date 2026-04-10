@@ -43,7 +43,7 @@ app.use("/donations", require("../routes/donations"));
 app.use("/api/auth", require("../routes/authRoutes"));
 
 
-app.use('/api/chat', require("../routes/chatRoutes"));
+app.use('/api/chat', require("../routes/chatRoute"));
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", message: "Server is running smoothly" });
