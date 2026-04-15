@@ -10,8 +10,8 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://student-ally-frontend.vercel.app"
-  "https://studentally.sakshikedari.tech/"
+  "https://student-ally-frontend.vercel.app",
+  "https://studentally.sakshikedari.tech"
 ];
 
 app.use(
